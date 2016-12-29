@@ -88,9 +88,104 @@ testing <- dataset[-split,]
 names(training)
 
 
-
+#train models with different set of independen variables
+#after model - resal in comments
 #quick start with logical regression
 modelFit <- glm(formula = left ~ ., 
                 family = binomial , 
                 training)
+#   glm(formula = left ~ ., family = binomial, data = training)
+# 
+# Deviance Residuals: 
+#   Min       1Q   Median       3Q      Max  
+# -2.2482  -0.6603  -0.4018  -0.1152   3.0534  
+# 
+# Coefficients:
+#   Estimate Std. Error z value Pr(>|z|)    
+# (Intercept)            -0.8996993  0.2062815  -4.362 1.29e-05 ***
+#   satisfaction_level     -4.1619938  0.1134434 -36.688  < 2e-16 ***
+#   last_evaluation         0.7911745  0.1720377   4.599 4.25e-06 ***
+#   number_project         -0.3223698  0.0248218 -12.987  < 2e-16 ***
+#   average_montly_hours    0.0045616  0.0005974   7.636 2.25e-14 ***
+#   time_spend_company      0.2656302  0.0178240  14.903  < 2e-16 ***
+#   Work_accident1         -1.5948253  0.1043029 -15.290  < 2e-16 ***
+#   promotion_last_5years1 -1.2249191  0.2933590  -4.175 2.97e-05 ***
+#   salary.L               -1.3793755  0.1050965 -13.125  < 2e-16 ***
+#   salary.Q               -0.3762478  0.0685437  -5.489 4.04e-08 ***
+#   sales_other             0.5390296  0.1533004   3.516 0.000438 ***
+#   sales_RandD            -0.0363993  0.1960747  -0.186 0.852727    
+# ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# (Dispersion parameter for binomial family taken to be 1)
+# 
+# Null deviance: 12351  on 11249  degrees of freedom
+# Residual deviance:  9627  on 11238  degrees of freedom
+# AIC: 9651
+# 
+# Number of Fisher Scoring iterations: 5
+modelFit <- glm(formula = left ~ . - sales_RandD,
+                family = binomial, 
+                training)
+# glm(formula = left ~ . - sales_RandD, family = binomial, data = training)
+# 
+# Deviance Residuals: 
+#   Min       1Q   Median       3Q      Max  
+# -2.2487  -0.6603  -0.4018  -0.1155   3.0534  
+# 
+# Coefficients:
+#   Estimate Std. Error z value Pr(>|z|)    
+# (Intercept)            -0.9210179  0.1716128  -5.367 8.01e-08 ***
+#   satisfaction_level     -4.1620957  0.1134436 -36.689  < 2e-16 ***
+#   last_evaluation         0.7915599  0.1720224   4.601 4.19e-06 ***
+#   number_project         -0.3224366  0.0248201 -12.991  < 2e-16 ***
+#   average_montly_hours    0.0045606  0.0005974   7.634 2.27e-14 ***
+#   time_spend_company      0.2658448  0.0177908  14.943  < 2e-16 ***
+#   Work_accident1         -1.5948993  0.1043024 -15.291  < 2e-16 ***
+#   promotion_last_5years1 -1.2226420  0.2930786  -4.172 3.02e-05 ***
+#   salary.L               -1.3773495  0.1045071 -13.179  < 2e-16 ***
+#   salary.Q               -0.3750686  0.0682412  -5.496 3.88e-08 ***
+#   sales_other             0.5606547  0.1000875   5.602 2.12e-08 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# (Dispersion parameter for binomial family taken to be 1)
+# 
+# Null deviance: 12350.7  on 11249  degrees of freedom
+# Residual deviance:  9627.1  on 11239  degrees of freedom
+# AIC: 9649.1
+# 
+# Number of Fisher Scoring iterations: 5
 summary(modelFit)
+
+
+# build confution matrix
+prediction <- predict(modelFit, type = "response", newdata = testing[-7])
+y_hat <- ifelse(prediction > 0.5, 1, 0)
+y_hat <- as.factor(y_hat)
+confusionMatrix(testing$left, y_hat)
+# Confusion Matrix and Statistics
+# 
+# Reference
+# Prediction    0    1
+# 0 2632  225
+# 1  575  317
+# 
+# Accuracy : 0.7866          
+# 95% CI : (0.7731, 0.7996)
+# No Information Rate : 0.8554          
+# P-Value [Acc > NIR] : 1               
+# 
+# Kappa : 0.3198          
+# Mcnemar's Test P-Value : <2e-16          
+#                                           
+#             Sensitivity : 0.8207          
+#             Specificity : 0.5849          
+#          Pos Pred Value : 0.9212          
+#          Neg Pred Value : 0.3554          
+#              Prevalence : 0.8554          
+#          Detection Rate : 0.7021          
+#    Detection Prevalence : 0.7621          
+#       Balanced Accuracy : 0.7028          
+#                                           
+#        'Positive' Class : 0    
