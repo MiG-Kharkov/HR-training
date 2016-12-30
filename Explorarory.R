@@ -4,7 +4,7 @@ install.packages("corrplot")
 library(ggplot2)
 library(caret)
 library(corrplot)
-
+library(e1071)
 
 #clear global environment
 rm(list = ls())
@@ -199,3 +199,42 @@ confusionMatrix(testing$left, y_hat)
 #       Balanced Accuracy : 0.7028          
 #                                           
 #        'Positive' Class : 0    
+
+# create prediction based on Naive Bayes from library e1071
+# importent - it works only with factors
+# -7 has our left column so we have to take it off 
+modelFit <- naiveBayes(x = training[,-7], y = training$left)
+summary(modelFit)
+# Length Class  Mode     
+# apriori  2     table  numeric  
+# tables  10     -none- list     
+# levels   2     -none- character
+# call     3     -none- call 
+prediction <- predict(modelFit,  newdata = testing[-7])
+confusionMatrix(testing$left, prediction)
+# Confusion Matrix and Statistics
+# 
+# Reference
+# Prediction    0    1
+# 0 2554  303
+# 1  312  580
+# 
+# Accuracy : 0.836           
+# 95% CI : (0.8237, 0.8477)
+# No Information Rate : 0.7645          
+# P-Value [Acc > NIR] : <2e-16          
+# 
+# Kappa : 0.5461          
+# Mcnemar's Test P-Value : 0.747           
+# 
+# Sensitivity : 0.8911          
+# Specificity : 0.6569          
+# Pos Pred Value : 0.8939          
+# Neg Pred Value : 0.6502          
+# Prevalence : 0.7645          
+# Detection Rate : 0.6812          
+# Detection Prevalence : 0.7621          
+# Balanced Accuracy : 0.7740          
+# 
+# 'Positive' Class : 0       
+
