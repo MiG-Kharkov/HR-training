@@ -1,12 +1,13 @@
 #Exploratory data
 install.packages("corrplot")
-
-#clear global environment
-rm(list = ls())
 #Load librarys
 library(ggplot2)
 library(caret)
 library(corrplot)
+
+
+#clear global environment
+rm(list = ls())
 
 dataset <- read.csv("HR_comma_sep.csv")
 
@@ -163,6 +164,15 @@ summary(modelFit)
 prediction <- predict(modelFit, type = "response", newdata = testing[-7])
 y_hat <- ifelse(prediction > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
+
+#get a confusion matrix without extra information 
+table(testing$left, y_hat)
+# y_hat
+# 0    1
+# 0 2632  225
+# 1  575  317
+
+#get a confusion matrix with extra datails with caret packege
 confusionMatrix(testing$left, y_hat)
 # Confusion Matrix and Statistics
 # 
