@@ -208,7 +208,19 @@ write.csv(cap_data, "cap_data.csv")
 # where I have calculated CAP analysis for the model
 # pic-02-cap analysis information.png shows information how to interpret this analysis
 
+# inforamtion for interactive confusion matrix based on threshold 
+# table was saved in file cap_data.csv and we will use it in for building web server in shiny
+# next code deploying application in cloud
+library(shiny)
+# as if we use public github i deleted secret inforamtion
+rsconnect::setAccountInfo(name='damsgroup', token='УДАЛИЛ', secret='УДАЛИЛ')
+# test application 
+runApp()
+library(rsconnect)
+# deploy app, don't do it from your compluter
+deployApp()
 
+#=================================================
 # create prediction based on Naive Bayes from library e1071
 # importent - it works only with factors
 
