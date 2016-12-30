@@ -202,15 +202,23 @@ confusionMatrix(testing$left, y_hat)
 
 # create prediction based on Naive Bayes from library e1071
 # importent - it works only with factors
+
 # -7 has our left column so we have to take it off 
-modelFit <- naiveBayes(x = training[,-7], y = training$left)
+# modelFit <- naiveBayes(x = training[,-7], y = training$left) #different way for a function call
+
+modelFit <- naiveBayes(left ~., data = training)
+
 summary(modelFit)
 # Length Class  Mode     
 # apriori  2     table  numeric  
 # tables  10     -none- list     
 # levels   2     -none- character
 # call     3     -none- call 
+
+#there is no probability for preduction only true false factors
+#so is a good question how to adjust this prediction using trustholder
 prediction <- predict(modelFit,  newdata = testing[-7])
+
 confusionMatrix(testing$left, prediction)
 # Confusion Matrix and Statistics
 # 
