@@ -19,11 +19,11 @@ dataset$salary <- ordered(dataset$salary, c("low","medium" ,"high"))
 summary(dataset)
 str(dataset)
 
-#check correlation 
-#only for numeric
+# check correlation 
+# only for numeric
 num.cols <- sapply(dataset,is.numeric)
 cor.data <- cor(dataset[,num.cols])
-#visualisation of corrolation with corrlot
+# visualisation of corrolation with corrlot
 corrplot(cor.data, method = "color")
 
 # Feature plot (*caret* package) - 
@@ -206,7 +206,7 @@ confusionMatrix(testing$left, y_hat)
 # -7 has our left column so we have to take it off 
 # modelFit <- naiveBayes(x = training[,-7], y = training$left) #different way for a function call
 
-modelFit <- naiveBayes(left ~., data = training)
+modelFit <- naiveBayes(left ~. , data = training)
 
 summary(modelFit)
 # Length Class  Mode     
@@ -215,8 +215,11 @@ summary(modelFit)
 # levels   2     -none- character
 # call     3     -none- call 
 
-#there is no probability for preduction only true false factors
-#so is a good question how to adjust this prediction using trustholder
+# there is no probability for preduction only true false factors
+# so is a good question how to adjust this prediction using threshold
+# answer for this questin is a paramert threshold - порог :)
+# I have added threshold with 0.5 и получил эпик фейл. 
+# не понятно, что надо сделать, что бы настройить, так что задача для всех
 prediction <- predict(modelFit,  newdata = testing[-7])
 
 confusionMatrix(testing$left, prediction)
@@ -243,6 +246,18 @@ confusionMatrix(testing$left, prediction)
 # Detection Rate : 0.6812          
 # Detection Prevalence : 0.7621          
 # Balanced Accuracy : 0.7740          
+
 # 
 # 'Positive' Class : 0       
+
+# I was trying to improve the model but got the identical result
+modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
+summary(modelFit)
+prediction <- predict(modelFit,  newdata = testing[-7])
+confusionMatrix(testing$left, prediction)
+# 
+# Reference
+# Prediction    0    1
+# 0 2554  303
+# 1  312  580
 
