@@ -200,6 +200,15 @@ confusionMatrix(testing$left, y_hat)
 #                                           
 #        'Positive' Class : 0    
 
+# I have probability for previous result so I am going to create CAP pot
+cap_data <- cbind(left = as.numeric(testing$left)-1, prediction)
+
+write.csv(cap_data, "cap_data.csv")
+# pic-03-cap analysis my model from exel is a screenshort from file cap_analysis.xlsx 
+# where I have calculated CAP analysis for the model
+# pic-02-cap analysis information.png shows information how to interpret this analysis
+
+
 # create prediction based on Naive Bayes from library e1071
 # importent - it works only with factors
 
