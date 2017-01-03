@@ -16,10 +16,12 @@ fluidPage(
   ),
   # Create a new row for the table.
   fluidRow(
+    titlePanel ("Confusion matrix"),
     dataTableOutput("table")
   ),
   # Summory information 
   fluidRow(
-    textOutput("txt")
+    textOutput("txt1"), 
+    textOutput("txt2")
   )
 )
