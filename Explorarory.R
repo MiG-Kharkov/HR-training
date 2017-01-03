@@ -40,6 +40,13 @@ featurePlot(x=dataset[,c("satisfaction_level","last_evaluation", "number_project
             plot="pairs")
 dev.off()
 
+# analysis of dependencies that affect leaves. 
+ggplot(dataset, aes(x =average_montly_hours, y =  time_spend_company))+ 
+  geom_point(color = as.numeric(dataset$left)+2)+
+  geom_density2d()+
+  labs(title="The probability destribution of leaving", x = "Avarange hours per month", y = "Years in the company")
+
+
 #various ways to visualize information 
 #histogram
 ggplot(dataset, aes(x = satisfaction_level))+ geom_histogram()
@@ -313,6 +320,8 @@ summary(prediction_bayes)
 y_hat <- ifelse(prediction_bayes > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
 confusionMatrix(testing$left, y_hat)
+
+# Cumulative Accuracy Profile (CAP)
 # I have probability for previous result so I am going to create CAP pot
 cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
 
