@@ -319,3 +319,6 @@ cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
 write.csv(cap_data_bayes, "cap_data_bayes.csv")
 # cap_analysis_bayes.xlsx has information from this model
 # pic-04-cap analysis for cap_data_bayes.png is a screenshort with CAP graphic
+
+# deploy a new app for bayes model
+deployApp()

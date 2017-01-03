@@ -1,1 +1,1 @@
-ds <- read.csv("cap_data.csv")
+ds <- read.csv("cap_data_bayes.csv")
