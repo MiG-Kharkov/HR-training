@@ -46,6 +46,12 @@ ggplot(dataset, aes(x =average_montly_hours, y =  time_spend_company))+
   geom_density2d()+
   labs(title="The probability destribution of leaving", x = "Avarange hours per month", y = "Years in the company")
 
+ggplot(dataset, aes(x =last_evaluation, y =  satisfaction_level))+ 
+  geom_point(color = as.numeric(dataset$left)+2)+
+  geom_density2d()+
+  labs(x="The level of the last evaluation", y = "The level of employee satisfaction", 
+       title = "The probability destribution of leaving")
+
 
 #various ways to visualize information 
 #histogram
