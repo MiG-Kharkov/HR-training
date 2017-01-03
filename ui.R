@@ -14,6 +14,11 @@ fluidPage(
            
     )  
   ),
+  #Plot
+  fluidRow(
+    titlePanel ("Visualisation"),
+    plotOutput("plot")
+  ),
   # Create a new row for the table.
   fluidRow(
     titlePanel ("Confusion matrix"),

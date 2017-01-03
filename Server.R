@@ -10,6 +10,10 @@ function(input, output) {
     cm <- confusionMatrix(ds$left, y_hat)
   })
   
+  output$plot <- renderPlot(
+    ggplot(ds, aes(x = ds$prediction, y= ds$left ))+ 
+      geom_point(color = ifelse(ds$prediction>input$threshold, 1,2) )
+  )
   output$table <- renderDataTable(
     dataset()$table, 
     options = list(paging = FALSE, searching = FALSE)
