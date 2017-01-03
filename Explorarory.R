@@ -237,10 +237,6 @@ summary(modelFit)
 # call     3     -none- call 
 
 # there is no probability for preduction only true false factors
-# so is a good question how to adjust this prediction using threshold
-# answer for this questin is a paramert threshold - порог :)
-# I have added threshold with 0.5 и получил эпик фейл. 
-# не понятно, что надо сделать, что бы настройить, так что задача для всех
 prediction <- predict(modelFit,  newdata = testing[-7])
 
 confusionMatrix(testing$left, prediction)
@@ -312,4 +308,14 @@ confusionMatrix(testing$left, y_hat)
 #        'Positive' Class : 0    
 
 # next step is to join two columns form prediction_row table in one vector
-# ???????
+prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2
+summary(prediction_bayes)
+y_hat <- ifelse(prediction_bayes > 0.5, 1, 0)
+y_hat <- as.factor(y_hat)
+confusionMatrix(testing$left, y_hat)
+# I have probability for previous result so I am going to create CAP pot
+cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
+
+write.csv(cap_data_bayes, "cap_data_bayes.csv")
+# cap_analysis_bayes.xlsx has information from this model
+# pic-04-cap analysis for cap_data_bayes.png is a screenshort with CAP graphic
