@@ -275,10 +275,41 @@ confusionMatrix(testing$left, prediction)
 modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
 summary(modelFit)
 prediction <- predict(modelFit,  newdata = testing[-7])
-confusionMatrix(testing$left, prediction)
+
+# privious function gives factors Yes No as a resalt. I am going to get probability  
+# for drawing CAP plot
+prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
+# I got not the same probфbility vector as for logical regression. 
+# this vector has two columns with probability for each variant. 
+# so folowing expression gets y_hat and it gives absolutely the same result
+y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
+y_hat <- as.factor(y_hat)
+confusionMatrix(testing$left, y_hat)
+# Confusion Matrix and Statistics
 # 
 # Reference
 # Prediction    0    1
 # 0 2554  303
 # 1  312  580
+# 
+# Accuracy : 0.836           
+# 95% CI : (0.8237, 0.8477)
+# No Information Rate : 0.7645          
+# P-Value [Acc > NIR] : <2e-16          
+# 
+# Kappa : 0.5461          
+# Mcnemar's Test P-Value : 0.747           
+#                                           
+#             Sensitivity : 0.8911          
+#             Specificity : 0.6569          
+#          Pos Pred Value : 0.8939          
+#          Neg Pred Value : 0.6502          
+#              Prevalence : 0.7645          
+#          Detection Rate : 0.6812          
+#    Detection Prevalence : 0.7621          
+#       Balanced Accuracy : 0.7740          
+#                                           
+#        'Positive' Class : 0    
 
+# next step is to join two columns form prediction_row table in one vector
+# ???????
