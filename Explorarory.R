@@ -38,20 +38,36 @@ featurePlot(x=dataset[,c("satisfaction_level","last_evaluation", "number_project
                           "salary")],
             y = dataset$left,
             plot="pairs")
-dev.off()
+dev.off() 
+
+featurePlot(x = dataset[,c("satisfaction_level","last_evaluation", "number_project",
+                           "average_montly_hours",
+                           "time_spend_company")], 
+            y = dataset$left, 
+            plot = "pairs",
+            ## Add a key at the top
+            auto.key = list(columns = 2))
 
 # analysis of dependencies that affect leaves. 
 ggplot(dataset, aes(x =average_montly_hours, y =  time_spend_company))+ 
-  geom_point(color = as.numeric(dataset$left)+2)+
+  geom_point(color = as.numeric(dataset$left))+
   geom_density2d()+
   labs(title="The probability destribution of leaving", x = "Avarange hours per month", y = "Years in the company")
 
 ggplot(dataset, aes(x =last_evaluation, y =  satisfaction_level))+ 
-  geom_point(color = as.numeric(dataset$left)+2)+
+  geom_point(color = as.numeric(dataset$left))+
   geom_density2d()+
   labs(x="The level of the last evaluation", y = "The level of employee satisfaction", 
        title = "The probability destribution of leaving")
 
+ggplot(dataset, aes(x =  satisfaction_level, colour = factor(left), fill = factor(left))) + geom_density() +
+  geom_vline(xintercept = mean(dataset$satisfaction_level))+
+  ggtitle("Satisfaction Level \n density plot \n w. Left") + xlab("Satisfaction level")
+
+ggplot(dataset, aes(x =  salary, y = satisfaction_level, fill = factor(left), colour = factor(left))) + 
+  geom_boxplot(outlier.colour = NA) +
+  geom_jitter(alpha = 0.1)+
+  ggtitle("Geom boxplot \n salary vs sat level") + xlab("Salary") + ylab("Satisfacion level") 
 
 #various ways to visualize information 
 #histogram
@@ -301,24 +317,24 @@ confusionMatrix(testing$left, y_hat)
 # 0 2554  303
 # 1  312  580
 # 
-# Accuracy : 0.836           
+# Accuracy : 0.836
 # 95% CI : (0.8237, 0.8477)
-# No Information Rate : 0.7645          
-# P-Value [Acc > NIR] : <2e-16          
+# No Information Rate : 0.7645
+# P-Value [Acc > NIR] : <2e-16
 # 
-# Kappa : 0.5461          
-# Mcnemar's Test P-Value : 0.747           
-#                                           
-#             Sensitivity : 0.8911          
-#             Specificity : 0.6569          
-#          Pos Pred Value : 0.8939          
-#          Neg Pred Value : 0.6502          
-#              Prevalence : 0.7645          
-#          Detection Rate : 0.6812          
-#    Detection Prevalence : 0.7621          
-#       Balanced Accuracy : 0.7740          
-#                                           
-#        'Positive' Class : 0    
+# Kappa : 0.5461
+# Mcnemar's Test P-Value : 0.747
+# 
+#             Sensitivity : 0.8911
+#             Specificity : 0.6569
+#          Pos Pred Value : 0.8939
+#          Neg Pred Value : 0.6502
+#              Prevalence : 0.7645
+#          Detection Rate : 0.6812
+#    Detection Prevalence : 0.7621
+#       Balanced Accuracy : 0.7740
+# 
+#        'Positive' Class : 0
 
 # next step is to join two columns form prediction_row table in one vector
 prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2
@@ -337,3 +353,7 @@ write.csv(cap_data_bayes, "cap_data_bayes.csv")
 
 # deploy a new app for bayes model
 deployApp()
+
+# Density plots probabilities for testing set
+ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(left))) + 
+  geom_density() + ggtitle("Predicted dens test set")
