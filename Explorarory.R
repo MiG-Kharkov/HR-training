@@ -366,3 +366,4 @@ ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(l
   geom_density() + ggtitle("Predicted denity for the test set")
 
 install.packages(ROCK)
+
