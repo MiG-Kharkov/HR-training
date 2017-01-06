@@ -195,14 +195,14 @@ y_hat <- ifelse(prediction > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
 
 #get a confusion matrix without extra information 
-table(testing$left, y_hat)
+table(y_hat, testing$left)
 # y_hat
 # 0    1
 # 0 2632  225
 # 1  575  317
 
 #get a confusion matrix with extra datails with caret packege
-confusionMatrix(testing$left, y_hat)
+confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
 # Reference
@@ -268,7 +268,7 @@ summary(modelFit)
 # there is no probability for preduction only true false factors
 prediction <- predict(modelFit,  newdata = testing[-7])
 
-confusionMatrix(testing$left, prediction)
+confusionMatrix(prediction, testing$left)
 # Confusion Matrix and Statistics
 # 
 # Reference
@@ -309,7 +309,7 @@ prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
 # so folowing expression gets y_hat and it gives absolutely the same result
 y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
 y_hat <- as.factor(y_hat)
-confusionMatrix(testing$left, y_hat)
+confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
 # Reference
@@ -341,11 +341,18 @@ prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2
 summary(prediction_bayes)
 y_hat <- ifelse(prediction_bayes > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
-confusionMatrix(testing$left, y_hat)
+confusionMatrix(y_hat, testing$left )
 
 # Cumulative Accuracy Profile (CAP)
 # I have probability for previous result so I am going to create CAP pot
-cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
+cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, predicted = round(prediction_bayes,5))
+# усли не преобразовыывать в дата фрейм то не будет можно имя, надо будет order(cap_dat_bayes[,2)]
+cap_data_bayes <- as.data.frame(cap_data_bayes)
+cap_data_bayes <-  cap_data_bayes[order(cap_data_bayes$predicted, decreasing = TRUE),]
+
+attach(cap_data_bayes)
+cap_data_bayes <- cap_data_bayes[order(left, -predicted),]
+detach(cap_data_bayes)
 
 write.csv(cap_data_bayes, "cap_data_bayes.csv")
 # cap_analysis_bayes.xlsx has information from this model
@@ -357,3 +364,5 @@ deployApp()
 # Density plots probabilities for testing set
 ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(left))) + 
   geom_density() + ggtitle("Predicted denity for the test set")
+
+install.packages(ROCK)

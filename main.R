@@ -9,11 +9,17 @@ rm(list = ls())
 
 # Load dataset and attach it to work wiht less code
 dataset <- read.csv("HR_comma_sep.csv")
-attach(dataset)
 
+dataset$left <- as.factor(dataset$left)
+dataset$promotion_last_5years<- as.factor(dataset$promotion_last_5years)
+dataset$Work_accident <- as.factor(dataset$Work_accident)
 
+str(dataset)
+dataset$salary <- factor(dataset$salary, order = TRUE, levels =  c("low","medium" ,"high"))
+dataset$salary <- ordered(dataset$salary, c("low","medium" ,"high"))
+dataset$salary <- factor(dataset$salary, order = TRUE)
 
-# it's useless command but why not :)
-# detach dataset
-detach(dataset)
+dummy_matrix <- model.matrix(~ salary+sales, data = dataset)
+table(dummy_matrix)
+
 
