@@ -196,38 +196,37 @@ y_hat <- as.factor(y_hat)
 
 #get a confusion matrix without extra information 
 table(y_hat, testing$left)
-# y_hat
-# 0    1
-# 0 2632  225
-# 1  575  317
+# y_hat    0    1
+# 0 2632  575
+# 1  225  317
 
 #get a confusion matrix with extra datails with caret packege
 confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
-# Prediction    0    1
-# 0 2632  225
-# 1  575  317
+#             Reference
+# Prediction  0    1
+#         0 2633  575
+#         1  224  317
 # 
-# Accuracy : 0.7866          
-# 95% CI : (0.7731, 0.7996)
-# No Information Rate : 0.8554          
-# P-Value [Acc > NIR] : 1               
+# Accuracy : 0.7869          
+# 95% CI : (0.7734, 0.7999)
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : 0.000166        
 # 
-# Kappa : 0.3198          
-# Mcnemar's Test P-Value : <2e-16          
+# Kappa : 0.3203          
+# Mcnemar's Test P-Value : < 2.2e-16       
 #                                           
-#             Sensitivity : 0.8207          
-#             Specificity : 0.5849          
-#          Pos Pred Value : 0.9212          
-#          Neg Pred Value : 0.3554          
-#              Prevalence : 0.8554          
-#          Detection Rate : 0.7021          
-#    Detection Prevalence : 0.7621          
-#       Balanced Accuracy : 0.7028          
+#             Sensitivity : 0.9216          
+#             Specificity : 0.3554          
+#          Pos Pred Value : 0.8208          
+#          Neg Pred Value : 0.5860          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.7023          
+#    Detection Prevalence : 0.8557          
+#       Balanced Accuracy : 0.6385          
 #                                           
-#        'Positive' Class : 0    
+#        'Positive' Class : 0      
 
 # I have probability for previous result so I am going to create CAP pot
 cap_data <- cbind(left = as.numeric(testing$left)-1, prediction)
@@ -271,30 +270,30 @@ prediction <- predict(modelFit,  newdata = testing[-7])
 confusionMatrix(prediction, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
+#             Reference
 # Prediction    0    1
-# 0 2554  303
-# 1  312  580
+#         0   2554  312
+#         1   303  580
 # 
 # Accuracy : 0.836           
 # 95% CI : (0.8237, 0.8477)
-# No Information Rate : 0.7645          
+# No Information Rate : 0.7621          
 # P-Value [Acc > NIR] : <2e-16          
 # 
 # Kappa : 0.5461          
 # Mcnemar's Test P-Value : 0.747           
-# 
-# Sensitivity : 0.8911          
-# Specificity : 0.6569          
-# Pos Pred Value : 0.8939          
-# Neg Pred Value : 0.6502          
-# Prevalence : 0.7645          
-# Detection Rate : 0.6812          
-# Detection Prevalence : 0.7621          
-# Balanced Accuracy : 0.7740          
+#                                           
+#             Sensitivity : 0.8939          
+#             Specificity : 0.6502          
+#          Pos Pred Value : 0.8911          
+#          Neg Pred Value : 0.6569          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.6812          
+#    Detection Prevalence : 0.7645          
+#       Balanced Accuracy : 0.7721          
+#                                           
+#        'Positive' Class : 0        
 
-# 
-# 'Positive' Class : 0       
 
 # I was trying to improve the model but got the identical result
 modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
@@ -309,32 +308,32 @@ prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
 # so folowing expression gets y_hat and it gives absolutely the same result
 y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
 y_hat <- as.factor(y_hat)
-confusionMatrix(y_hat, testing$left)
+cm <-confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
+#             Reference
 # Prediction    0    1
-# 0 2554  303
-# 1  312  580
+#         0   2554  312
+#         1   303  580
 # 
-# Accuracy : 0.836
+# Accuracy : 0.836           
 # 95% CI : (0.8237, 0.8477)
-# No Information Rate : 0.7645
-# P-Value [Acc > NIR] : <2e-16
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : <2e-16          
 # 
-# Kappa : 0.5461
-# Mcnemar's Test P-Value : 0.747
-# 
-#             Sensitivity : 0.8911
-#             Specificity : 0.6569
-#          Pos Pred Value : 0.8939
-#          Neg Pred Value : 0.6502
-#              Prevalence : 0.7645
-#          Detection Rate : 0.6812
-#    Detection Prevalence : 0.7621
-#       Balanced Accuracy : 0.7740
-# 
-#        'Positive' Class : 0
+# Kappa : 0.5461          
+# Mcnemar's Test P-Value : 0.747           
+#                                           
+#             Sensitivity : 0.8939          
+#             Specificity : 0.6502          
+#          Pos Pred Value : 0.8911          
+#          Neg Pred Value : 0.6569          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.6812          
+#    Detection Prevalence : 0.7645          
+#       Balanced Accuracy : 0.7721          
+#                                           
+#        'Positive' Class : 0      
 
 # next step is to join two columns form prediction_row table in one vector
 prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2

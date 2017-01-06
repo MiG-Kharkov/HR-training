@@ -20,15 +20,27 @@ function(input, output) {
   )
   
   output$txt1 <- renderText(
-    paste("Accuracy with threshold ", input$threshold, " is ", 
-          round(dataset()$overall["Accuracy"],3)
+    paste("Accuracy is ", 
+          round(dataset()$overall["Accuracy"],5)
           )
   )
   
   output$txt2 <- renderText(
-    paste("Kappa with threshold ", input$threshold, " is ", 
-          round(dataset()$overall["Kappa"],3)
+    paste("Kappa with threshold is ", 
+          round(dataset()$overall["Kappa"],5)
           )
+  )
+
+  output$txt3 <- renderText(
+    paste("Sensitivity is ", 
+          round(dataset()$byClass[1],5)
+    )
+  )
+  
+  output$txt4 <- renderText(
+    paste("Specificity is ", 
+          round(dataset()$byClass[2],5)
+    )
   )
   
 }

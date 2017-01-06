@@ -27,6 +27,8 @@ fluidPage(
   # Summory information 
   fluidRow(
     textOutput("txt1"), 
-    textOutput("txt2")
+    textOutput("txt2"), 
+    textOutput("txt3"), 
+    textOutput("txt4")
   )
 )
