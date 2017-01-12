@@ -1,10 +1,13 @@
-#Exploratory data
+# Exploratory data
+# Preliminary analysis real work is supposed to be in main.R
 install.packages("corrplot")
+install.packages(ROCR)
 #Load librarys
 library(ggplot2)
 library(caret)
 library(corrplot)
 library(e1071)
+library(ROCR)
 
 #clear global environment
 rm(list = ls())
@@ -308,7 +311,7 @@ prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
 # so folowing expression gets y_hat and it gives absolutely the same result
 y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
 y_hat <- as.factor(y_hat)
-cm <-confusionMatrix(y_hat, testing$left)
+confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
 #             Reference
@@ -364,5 +367,25 @@ deployApp()
 ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(left))) + 
   geom_density() + ggtitle("Predicted denity for the test set")
 
-install.packages(ROCK)
 
+# Building ROC plot
+
+# These functions return or set information about the individual slots in an object.
+auc <- slot(performance(pred, "auc"), "y.values")[[1]]
+
+# This function is used to transform the input data into a standardized format.
+pred <- prediction(prediction_bayes, testing$left)
+# All kinds of predictor evaluations are performed using this function.
+perf <- performance(pred,"tpr", "fpr")
+
+plot(perf)
+lines(c(0,1),c(0,1))
+text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
+title("ROC Curve")
+
+# train with random forest model
+rf.model <- train(left ~., data = training, method = "rf")
+summary(rf.model)
+
+rf.prediction <- predict(rf.model, newdata = testing[-7])
+confusionMatrix(rf.prediction, testing$left)
