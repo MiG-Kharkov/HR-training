@@ -5,7 +5,7 @@ library(ggplot2)
 library(caret)
 library(corrplot)
 library(e1071)
-
+library(ROCR)
 #clear global environment
 rm(list = ls())
 
@@ -172,6 +172,17 @@ table(testing$left, y_hat)
 # 0 2632  225
 # 1  575  317
 
+# plot ROC Curve
+ROCRpred = prediction(prediction, testing$left)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+auc <- slot(performance(ROCRpred, "auc"), "y.values")[[1]]
+plot(ROCRperf, colorize=TRUE)
+abline(h=seq(0,1,0.05), v=seq(0,1,0.05), col = "lightgray", lty = "dotted")
+lines(c(0,1),c(0,1), col = "gray", lwd =2)
+text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
+title("ROC Curve")
+#plot(ROCRperf, colorize=TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj=c(-0.2,1.7))
+
 #get a confusion matrix with extra datails with caret packege
 confusionMatrix(testing$left, y_hat)
 # Confusion Matrix and Statistics
@@ -272,9 +283,11 @@ modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
 summary(modelFit)
 prediction <- predict(modelFit,  newdata = testing[-7])
 
+
 # privious function gives factors Yes No as a resalt. I am going to get probability  
 # for drawing CAP plot
 prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
+
 # I got not the same probфbility vector as for logical regression. 
 # this vector has two columns with probability for each variant. 
 # so folowing expression gets y_hat and it gives absolutely the same result
@@ -313,12 +326,29 @@ summary(prediction_bayes)
 y_hat <- ifelse(prediction_bayes > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
 confusionMatrix(testing$left, y_hat)
+
+#ROC curve
+ROCRpred = prediction(prediction_bayes, testing$left)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+auc <- slot(performance(ROCRpred, "auc"), "y.values")[[1]]
+plot(ROCRperf, colorize=TRUE)
+abline(h=seq(0,1,0.05), v=seq(0,1,0.05), col = "lightgray", lty = "dotted")
+lines(c(0,1),c(0,1), col = "gray", lwd =2)
+text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
+title("ROC Curve")
+#phi<-performance(ROCRpred, "phi") ??????????????
+
+
+
 # I have probability for previous result so I am going to create CAP pot
 cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
 
 write.csv(cap_data_bayes, "cap_data_bayes.csv")
 # cap_analysis_bayes.xlsx has information from this model
 # pic-04-cap analysis for cap_data_bayes.png is a screenshort with CAP graphic
-
+ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(left))) + 
+    geom_density() + ggtitle("Predicted dens test set")
 # deploy a new app for bayes model
 deployApp()
+
+
