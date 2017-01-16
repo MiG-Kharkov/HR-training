@@ -5,14 +5,14 @@ library(caret)
 function(input, output) {
   
   dataset <- reactive({
-    y_hat <- ifelse(ds$prediction > input$threshold, 1, 0)
+    y_hat <- ifelse(ds$predicted > input$threshold, 1, 0)
     y_hat<-as.factor(y_hat)
-    cm <- confusionMatrix(ds$left, y_hat)
+    cm <- confusionMatrix(y_hat, ds$left)
   })
   
   output$plot <- renderPlot(
-    ggplot(ds, aes(x = ds$prediction, y= ds$left ))+ 
-      geom_point(color = ifelse(ds$prediction>input$threshold, 1,2) )
+    ggplot(ds, aes(x = ds$predicted, y= ds$left ))+ 
+      geom_point(color = ifelse(ds$predicted>input$threshold, 1,2) )
   )
   output$table <- renderDataTable(
     dataset()$table, 
@@ -20,15 +20,27 @@ function(input, output) {
   )
   
   output$txt1 <- renderText(
-    paste("Accuracy with threshold ", input$threshold, " is ", 
-          round(dataset()$overall["Accuracy"],3)
+    paste("Accuracy is ", 
+          round(dataset()$overall["Accuracy"],5)
           )
   )
   
   output$txt2 <- renderText(
-    paste("Kappa with threshold ", input$threshold, " is ", 
-          round(dataset()$overall["Kappa"],3)
+    paste("Kappa with threshold is ", 
+          round(dataset()$overall["Kappa"],5)
           )
+  )
+
+  output$txt3 <- renderText(
+    paste("Sensitivity is ", 
+          round(dataset()$byClass[1],5)
+    )
+  )
+  
+  output$txt4 <- renderText(
+    paste("Specificity is ", 
+          round(dataset()$byClass[2],5)
+    )
   )
   
 }
