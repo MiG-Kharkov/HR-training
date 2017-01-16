@@ -1,5 +1,7 @@
-#Exploratory data
+# Exploratory data
+# Preliminary analysis real work is supposed to be in main.R
 install.packages("corrplot")
+install.packages(ROCR)
 #Load librarys
 library(ggplot2)
 library(caret)
@@ -38,7 +40,36 @@ featurePlot(x=dataset[,c("satisfaction_level","last_evaluation", "number_project
                           "salary")],
             y = dataset$left,
             plot="pairs")
-dev.off()
+dev.off() 
+
+featurePlot(x = dataset[,c("satisfaction_level","last_evaluation", "number_project",
+                           "average_montly_hours",
+                           "time_spend_company")], 
+            y = dataset$left, 
+            plot = "pairs",
+            ## Add a key at the top
+            auto.key = list(columns = 2))
+
+# analysis of dependencies that affect leaves. 
+ggplot(dataset, aes(x =average_montly_hours, y =  time_spend_company))+ 
+  geom_point(color = as.numeric(dataset$left))+
+  geom_density2d()+
+  labs(title="The probability destribution of leaving", x = "Avrenge hours per month", y = "Years in the company")
+
+ggplot(dataset, aes(x =last_evaluation, y =  satisfaction_level))+ 
+  geom_point(color = as.numeric(dataset$left))+
+  geom_density2d()+
+  labs(x="The level of the last evaluation", y = "The level of employee satisfaction", 
+       title = "The probability destribution of leaving")
+
+ggplot(dataset, aes(x =  satisfaction_level, colour = factor(left), fill = factor(left))) + geom_density() +
+  geom_vline(xintercept = mean(dataset$satisfaction_level))+
+  ggtitle("Satisfaction Level \n density plot \n w. Left") + xlab("Satisfaction level")
+
+ggplot(dataset, aes(x =  salary, y = satisfaction_level, fill = factor(left), colour = factor(left))) + 
+  geom_boxplot(outlier.colour = NA) +
+  geom_jitter(alpha = 0.1)+
+  ggtitle("Geom boxplot \n salary vs sat level") + xlab("Salary") + ylab("Satisfacion level") 
 
 #various ways to visualize information 
 #histogram
@@ -166,11 +197,10 @@ y_hat <- ifelse(prediction > 0.5, 1, 0)
 y_hat <- as.factor(y_hat)
 
 #get a confusion matrix without extra information 
-table(testing$left, y_hat)
-# y_hat
-# 0    1
-# 0 2632  225
-# 1  575  317
+table(y_hat, testing$left)
+# y_hat    0    1
+# 0 2632  575
+# 1  225  317
 
 # plot ROC Curve
 ROCRpred = prediction(prediction, testing$left)
@@ -184,32 +214,32 @@ title("ROC Curve")
 #plot(ROCRperf, colorize=TRUE, print.cutoffs.at=seq(0,1,0.1), text.adj=c(-0.2,1.7))
 
 #get a confusion matrix with extra datails with caret packege
-confusionMatrix(testing$left, y_hat)
+confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
-# Prediction    0    1
-# 0 2632  225
-# 1  575  317
+#             Reference
+# Prediction  0    1
+#         0 2633  575
+#         1  224  317
 # 
-# Accuracy : 0.7866          
-# 95% CI : (0.7731, 0.7996)
-# No Information Rate : 0.8554          
-# P-Value [Acc > NIR] : 1               
+# Accuracy : 0.7869          
+# 95% CI : (0.7734, 0.7999)
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : 0.000166        
 # 
-# Kappa : 0.3198          
-# Mcnemar's Test P-Value : <2e-16          
+# Kappa : 0.3203          
+# Mcnemar's Test P-Value : < 2.2e-16       
 #                                           
-#             Sensitivity : 0.8207          
-#             Specificity : 0.5849          
-#          Pos Pred Value : 0.9212          
-#          Neg Pred Value : 0.3554          
-#              Prevalence : 0.8554          
-#          Detection Rate : 0.7021          
-#    Detection Prevalence : 0.7621          
-#       Balanced Accuracy : 0.7028          
+#             Sensitivity : 0.9216          
+#             Specificity : 0.3554          
+#          Pos Pred Value : 0.8208          
+#          Neg Pred Value : 0.5860          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.7023          
+#    Detection Prevalence : 0.8557          
+#       Balanced Accuracy : 0.6385          
 #                                           
-#        'Positive' Class : 0    
+#        'Positive' Class : 0      
 
 # I have probability for previous result so I am going to create CAP pot
 cap_data <- cbind(left = as.numeric(testing$left)-1, prediction)
@@ -250,33 +280,33 @@ summary(modelFit)
 # there is no probability for preduction only true false factors
 prediction <- predict(modelFit,  newdata = testing[-7])
 
-confusionMatrix(testing$left, prediction)
+confusionMatrix(prediction, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
+#             Reference
 # Prediction    0    1
-# 0 2554  303
-# 1  312  580
+#         0   2554  312
+#         1   303  580
 # 
 # Accuracy : 0.836           
 # 95% CI : (0.8237, 0.8477)
-# No Information Rate : 0.7645          
+# No Information Rate : 0.7621          
 # P-Value [Acc > NIR] : <2e-16          
 # 
 # Kappa : 0.5461          
 # Mcnemar's Test P-Value : 0.747           
-# 
-# Sensitivity : 0.8911          
-# Specificity : 0.6569          
-# Pos Pred Value : 0.8939          
-# Neg Pred Value : 0.6502          
-# Prevalence : 0.7645          
-# Detection Rate : 0.6812          
-# Detection Prevalence : 0.7621          
-# Balanced Accuracy : 0.7740          
+#                                           
+#             Sensitivity : 0.8939          
+#             Specificity : 0.6502          
+#          Pos Pred Value : 0.8911          
+#          Neg Pred Value : 0.6569          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.6812          
+#    Detection Prevalence : 0.7645          
+#       Balanced Accuracy : 0.7721          
+#                                           
+#        'Positive' Class : 0        
 
-# 
-# 'Positive' Class : 0       
 
 # I was trying to improve the model but got the identical result
 modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
@@ -293,37 +323,34 @@ prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
 # so folowing expression gets y_hat and it gives absolutely the same result
 y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
 y_hat <- as.factor(y_hat)
-confusionMatrix(testing$left, y_hat)
+confusionMatrix(y_hat, testing$left)
 # Confusion Matrix and Statistics
 # 
-# Reference
+#             Reference
 # Prediction    0    1
-# 0 2554  303
-# 1  312  580
+#         0   2554  312
+#         1   303  580
 # 
 # Accuracy : 0.836           
 # 95% CI : (0.8237, 0.8477)
 # No Information Rate : 0.7645          
-
-
-
-
+# No Information Rate : 0.7621          
 
 # P-Value [Acc > NIR] : <2e-16          
 # 
 # Kappa : 0.5461          
 # Mcnemar's Test P-Value : 0.747           
 #                                           
-#             Sensitivity : 0.8911          
-#             Specificity : 0.6569          
-#          Pos Pred Value : 0.8939          
-#          Neg Pred Value : 0.6502          
-#              Prevalence : 0.7645          
+#             Sensitivity : 0.8939          
+#             Specificity : 0.6502          
+#          Pos Pred Value : 0.8911          
+#          Neg Pred Value : 0.6569          
+#              Prevalence : 0.7621          
 #          Detection Rate : 0.6812          
-#    Detection Prevalence : 0.7621          
-#       Balanced Accuracy : 0.7740          
+#    Detection Prevalence : 0.7645          
+#       Balanced Accuracy : 0.7721          
 #                                           
-#        'Positive' Class : 0    
+#        'Positive' Class : 0      
 
 # next step is to join two columns form prediction_row table in one vector
 prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2
@@ -345,8 +372,19 @@ title("ROC Curve")
 
 
 
+confusionMatrix(y_hat, testing$left )
+
+# Cumulative Accuracy Profile (CAP)
+
 # I have probability for previous result so I am going to create CAP pot
-cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, prediction_bayes)
+cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, predicted = round(prediction_bayes,5))
+# усли не преобразовыывать в дата фрейм то не будет можно имя, надо будет order(cap_dat_bayes[,2)]
+cap_data_bayes <- as.data.frame(cap_data_bayes)
+cap_data_bayes <-  cap_data_bayes[order(cap_data_bayes$predicted, decreasing = TRUE),]
+
+attach(cap_data_bayes)
+cap_data_bayes <- cap_data_bayes[order(left, -predicted),]
+detach(cap_data_bayes)
 
 write.csv(cap_data_bayes, "cap_data_bayes.csv")
 # cap_analysis_bayes.xlsx has information from this model
@@ -357,3 +395,29 @@ ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(l
 deployApp()
 
 
+# Density plots probabilities for testing set
+ggplot(testing, aes(x = prediction_bayes, fill = factor(left), colour = factor(left))) + 
+  geom_density() + ggtitle("Predicted denity for the test set")
+
+
+# Building ROC plot
+
+# These functions return or set information about the individual slots in an object.
+auc <- slot(performance(pred, "auc"), "y.values")[[1]]
+
+# This function is used to transform the input data into a standardized format.
+pred <- prediction(prediction_bayes, testing$left)
+# All kinds of predictor evaluations are performed using this function.
+perf <- performance(pred,"tpr", "fpr")
+
+plot(perf)
+lines(c(0,1),c(0,1))
+text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
+title("ROC Curve")
+
+# train with random forest model
+rf.model <- train(left ~., data = training, method = "rf")
+summary(rf.model)
+
+rf.prediction <- predict(rf.model, newdata = testing[-7])
+confusionMatrix(rf.prediction, testing$left)
