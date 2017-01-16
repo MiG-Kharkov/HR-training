@@ -291,6 +291,11 @@ confusionMatrix(testing$left, y_hat)
 # Accuracy : 0.836           
 # 95% CI : (0.8237, 0.8477)
 # No Information Rate : 0.7645          
+
+
+
+
+
 # P-Value [Acc > NIR] : <2e-16          
 # 
 # Kappa : 0.5461          
