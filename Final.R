@@ -4,14 +4,12 @@ if (!require("ggplot2"))  install.packages("ggplot2")
 if (!require("caret"))    install.packages("caret")
 if (!require("e1071"))    install.packages("e1071")
 if (!require("car"))      install.packages("car")
-if (!require("nortets"))  install.packages("nortest")
-if (!require("pastecs"))  install.packages("pastecs")
 if (!require("stats"))    install.packages("stats")
-if (!require("MASS"))    install.packages("MASS")
-if (!require("leaps"))    install.packages("leaps")
 if (!require("gridExtra"))    install.packages("gridExtra")
 if (!require("ROCR"))    install.packages("ROCR")
 if (!require("fBasics"))    install.packages("fBasics")
+if (!require("randomForest"))    install.packages("randomForest")
+
 
 # Load librarys
 library(caret)
@@ -19,14 +17,13 @@ library(ggplot2)
 library(corrplot)
 library(e1071)
 library(car)
-library(nortest)
-library(pastecs)
 library(stats)
-library(MASS)
-library(leaps)
 library(gridExtra)
 library(ROCR)
 library(fBasics)
+library(randomForest)
+library(ElemStatLearn)
+
 
 # Read database
 dataset <- read.csv("HR_comma_sep.csv")
@@ -100,15 +97,17 @@ set.seed(123)
 split = createDataPartition(y=dataset$left, p=0.33, list=FALSE)
 smallsample <- dataset[split, ]
 
-print(shapiro.test(smallsample$last_evaluation))
-print(ksnormTest(unique(x)))
+print(shapiroTest(smallsample$last_evaluation))
+print(ksnormTest(unique(dataset$last_evaluation)))
 print(adTest(sort(dataset$last_evaluation)))
-print(cvm.test(dataset$last_evaluation))
-print(lillie.test(dataset$last_evaluation))
+print(lillieTest(dataset$last_evaluation))
 
-# Shapiro-Wilk normality test
-# data:  x1
-# W = 0.95226, p-value < 2.2e-16
+# Shapiro - Wilk Normality Test
+# Test Results:
+#   STATISTIC:
+#   W: 0.9507
+# P VALUE:
+#   < 2.2e-16 
 
 #   One-sample Kolmogorov-Smirnov test
 # Test Results:
@@ -126,14 +125,13 @@ print(lillie.test(dataset$last_evaluation))
 # P VALUE:
 #   < 2.2e-16 
 # 
-# Cramer-von Mises normality test
-# data:  x
-# W = 34.425, p-value = 7.37e-10
-# 
+#  Lilliefors (KS) Normality Test
 
-# Lilliefors (Kolmogorov-Smirnov) normality test
-# data:  x
-# D = 0.087476, p-value < 2.2e-16
+# Test Results:
+#   STATISTIC:
+#   D: 0.0875
+# P VALUE:
+#   < 2.2e-16 
 
 # For other variables we have the same result
 
@@ -226,6 +224,37 @@ abline(h=seq(0,1,0.05), v=seq(0,1,0.05), col = "lightgray", lty = "dotted")
 lines(c(0,1),c(0,1), col = "gray", lwd =2)
 text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
 title("ROC Curve Bayes")
+
+#MODEL 2 train with random forest model
+
+rf.model <- randomForest(x = training[-7], y = training$left)
+rf.predict <- predict(rf.model, testing[-7])
+confusionMatrix(rf.predict, testing$left)
+# Confusion Matrix and Statistics
+# 
+# Reference
+# Prediction    0    1
+# 0 2852   29
+# 1    5  863
+# 
+# Accuracy : 0.9909          
+# 95% CI : (0.9873, 0.9937)
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : < 2.2e-16       
+# 
+# Kappa : 0.9748          
+# Mcnemar's Test P-Value : 7.998e-05       
+#                                           
+#             Sensitivity : 0.9982          
+#             Specificity : 0.9675          
+#          Pos Pred Value : 0.9899          
+#          Neg Pred Value : 0.9942          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.7607          
+#    Detection Prevalence : 0.7685          
+#       Balanced Accuracy : 0.9829
+
+
 
 
 
