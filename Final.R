@@ -171,25 +171,21 @@ cor.test(dataset$number_project,dataset$average_montly_hours)
 vif(glm(formula = left ~ . ,family = binomial,data = dataset))
 #GVIFs are from 1 to 2 so there is no multicollinearity
 
-#MODEL 1 
+#MODEL 
 set.seed(123)
 split = createDataPartition(y=dataset$left, p=0.75, list=FALSE)
 training <- dataset[split, ]
 testing <- dataset[-split,]
 
 
-#MODEL 2 NAIVE BAYES
-modelFit <- naiveBayes(left ~. , data = training)
+#MODEL 1 NAIVE BAYES
+modelFit <- naiveBayes(left ~. , data = training )
+prediction_prob <- predict(modelFit,  newdata = testing[-7], type = "raw")
+prediction_bayes <- prediction_prob[,2]
+y_hat <- ifelse(prediction_bayes<0.5, 0, 1)
+y_hat <- as.factor(y_hat)
+confusionMatrix(y_hat, testing$left)
 
-summary(modelFit)
-# Length Class  Mode     
-# apriori  2     table  numeric  
-# tables   9     -none- list     
-# levels   2     -none- character
-# call     4     -none- call 
-
-prediction <- predict(modelFit,  newdata = testing[-7])
-confusionMatrix(prediction, testing$left)
 # Confusion Matrix and Statistics
 # 
 #             Reference
@@ -214,97 +210,14 @@ confusionMatrix(prediction, testing$left)
 # Detection Prevalence : 0.7975          
 # Balanced Accuracy : 0.7548          
 
-# Look at data with dummy variables       
-modelFit1 <- naiveBayes(left ~. , data = training1)
+#Accuracy : 0.8408 means that we predict correctly 84% of results about who left and stayed 
+# Sensitivity : 0.9188   means that we predict correct result 92% of stayed people      
+# Specificity : 0.5908 means that we predict correct result 59% of left people
 
-summary(modelFit1)
-# Length Class  Mode     
-# apriori  2     table  numeric  
-# tables   10     -none- list     
-# levels   2     -none- character
-# call     4     -none- call 
-
-
-prediction <- predict(modelFit1,  newdata = testing1[-7])
-confusionMatrix(prediction, testing1$left)
-
-# I was trying to improve the model but got the identical result
-modelFit <- naiveBayes(left ~. - sales_RandD , data = training)
-summary(modelFit)
-prediction <- predict(modelFit,  newdata = testing[-7])
-
-# Confusion Matrix and Statistics
-# 
-# Reference
-# Prediction    0    1
-# 0 2566  305
-# 1  291  587
-# 
-# Accuracy : 0.841           
-# 95% CI : (0.8289, 0.8526)
-# No Information Rate : 0.7621          
-# P-Value [Acc > NIR] : <2e-16          
-# 
-# Kappa : 0.5592          
-# Mcnemar's Test P-Value : 0.5944          
-# 
-# Sensitivity : 0.8981          
-# Specificity : 0.6581          
-# Pos Pred Value : 0.8938          
-# Neg Pred Value : 0.6686          
-# Prevalence : 0.7621          
-# Detection Rate : 0.6844          
-# Detection Prevalence : 0.7658          
-# Balanced Accuracy : 0.7781
-
-#we have almost the same accuracy, but a little different sensetivity and specifity
-
-# privious function gives factors Yes No as a resalt. I am going to get probability  
-# for drawing CAP plot
-prediction_raw <- predict(modelFit,  newdata = testing[-7], type = "raw")
-
-# I got not the same probфbility vector as for logical regression. 
-# this vector has two columns with probability for each variant. 
-# so folowing expression gets y_hat and it gives absolutely the same result
-y_hat <- ifelse(prediction_raw[,1] > prediction_raw[,2], 0, 1)
-y_hat <- as.factor(y_hat)
-confusionMatrix(y_hat, testing$left)
-# Confusion Matrix and Statistics
-# 
-#             Reference
-# Prediction    0    1
-#         0   2554  312
-#         1   303  580
-# 
-# Accuracy : 0.836           
-# 95% CI : (0.8237, 0.8477)
-# No Information Rate : 0.7645          
-# No Information Rate : 0.7621          
-
-# P-Value [Acc > NIR] : <2e-16          
-# 
-# Kappa : 0.5461          
-# Mcnemar's Test P-Value : 0.747           
-#                                           
-#             Sensitivity : 0.8939          
-#             Specificity : 0.6502          
-#          Pos Pred Value : 0.8911          
-#          Neg Pred Value : 0.6569          
-#              Prevalence : 0.7621          
-#          Detection Rate : 0.6812          
-#    Detection Prevalence : 0.7645          
-#       Balanced Accuracy : 0.7721          
-#                                           
-#        'Positive' Class : 0      
-
-# next step is to join two columns form prediction_row table in one vector
-prediction_bayes <- (prediction_raw[,2]- prediction_raw[,1]+1)/2
-summary(prediction_bayes)
-y_hat <- ifelse(prediction_bayes > 0.5, 1, 0)
-y_hat <- as.factor(y_hat)
-confusionMatrix(testing$left, y_hat)
 
 #ROC curve
+
+par(mfrow=c(1,1))
 ROCRpred = prediction(prediction_bayes, testing$left)
 ROCRperf = performance(ROCRpred, "tpr", "fpr")
 auc <- slot(performance(ROCRpred, "auc"), "y.values")[[1]]
@@ -312,5 +225,8 @@ plot(ROCRperf, colorize=TRUE)
 abline(h=seq(0,1,0.05), v=seq(0,1,0.05), col = "lightgray", lty = "dotted")
 lines(c(0,1),c(0,1), col = "gray", lwd =2)
 text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
-title("ROC Curve")
-#phi<-performance(ROCRpred, "phi") ??????????????
+title("ROC Curve Bayes")
+
+
+
+
