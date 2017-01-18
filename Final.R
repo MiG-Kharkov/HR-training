@@ -225,7 +225,7 @@ lines(c(0,1),c(0,1), col = "gray", lwd =2)
 text(0.6,0.2,paste("AUC=", round(auc,4), sep=""), cex=1.4)
 title("ROC Curve Bayes")
 
-#MODEL 2 train with random forest model
+#MODEL 2 train with random forest model (packege Random Forest)
 
 rf.model <- randomForest(x = training[-7], y = training$left)
 rf.predict <- predict(rf.model, testing[-7])
@@ -254,7 +254,61 @@ confusionMatrix(rf.predict, testing$left)
 #    Detection Prevalence : 0.7685          
 #       Balanced Accuracy : 0.9829
 
+#MODEL 2 train with random forest model (packege caret)
+rf.model <- train(left ~., data = training, method = "rf")
+summary(rf.model)
 
+# call                4  -none-     call     
+# type                1  -none-     character
+# predicted       11250  factor     numeric  
+# err.rate         1500  -none-     numeric  
+# confusion           6  -none-     numeric  
+# votes           22500  matrix     numeric  
+# oob.times       11250  -none-     numeric  
+# classes             2  -none-     character
+# importance         18  -none-     numeric  
+# importanceSD        0  -none-     NULL     
+# localImportance     0  -none-     NULL     
+# proximity           0  -none-     NULL     
+# ntree               1  -none-     numeric  
+# mtry                1  -none-     numeric  
+# forest             14  -none-     list     
+# y               11250  factor     numeric  
+# test                0  -none-     NULL     
+# inbag               0  -none-     NULL     
+# xNames             18  -none-     character
+# problemType         1  -none-     character
+# tuneValue           1  data.frame list     
+# obsLevels           2  -none-     character
+
+rf.prediction <- predict(rf.model, newdata = testing[-7])
+confusionMatrix(rf.prediction, testing$left)
+
+# Confusion Matrix and Statistics
+# 
+# Reference
+# Prediction    0    1
+# 0 2852   28
+# 1    5  864
+# 
+# Accuracy : 0.9912          
+# 95% CI : (0.9877, 0.9939)
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : < 2.2e-16       
+# 
+# Kappa : 0.9755          
+# Mcnemar's Test P-Value : 0.0001283       
+#                                           
+#             Sensitivity : 0.9982          
+#             Specificity : 0.9686          
+#          Pos Pred Value : 0.9903          
+#          Neg Pred Value : 0.9942          
+#              Prevalence : 0.7621          
+#          Detection Rate : 0.7607          
+#    Detection Prevalence : 0.7682          
+#       Balanced Accuracy : 0.9834          
+#                                           
+#        'Positive' Class : 0
 
 
 
