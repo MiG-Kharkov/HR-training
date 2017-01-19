@@ -215,28 +215,28 @@ confusionMatrix(y_hat, testing$left)
 # Specificity : 0.5908 means that we predict correct result 59% of left people
 
 #Build CAP curve
-
-cap_data_bayes <- cbind(left = as.numeric(testing$left)-1, predicted = round(prediction_bayes,5))
-cap_data_bayes <- as.data.frame(cap_data_bayes)
-
-
-attach(cap_data_bayes)
-nraws <- length(left)
-nleft <- length(left[left==1])
-cap_data_bayes <- cbind (cap_data_bayes[order( -predicted),], Percent_of_Sample = (1:nraws)/nraws)
+CAP_curve <- function(lf,yhat){
+  
+lf <-   testing$left
+yhat<- prediction_bayes
+cap <- cbind(left = (as.numeric(lf)-1), predicted = yhat)
+nraws <- length(cap[,1])
+nleft <- sum(cap[,1])
+cap <- cbind (cap[order( -predicted),], Percent_of_Sample = (1:nraws)/nraws)
 n <-0
 for (i in 1:nraws) {
-  n <- cap_data_bayes[i,1]+n
-  cap_data_bayes[i,4]<- n/nleft
+  n <- cap[i,1]+n
+  cap[i,4]<- n/nleft
 }
 perc=nleft/nraws
-detach(cap_data_bayes)
 
-plot(x = cap_data_bayes[,3], y = cap_data_bayes[,4], col = "red", lwd =0.3, 
+plot(x = cap[,3], y = cap[,4], col = "red", lwd =0.3, 
      xlab = "Percent of Sample", ylab = "Predicted Left")
 lines(c(0,1),c(0,1), col = "gray", lwd =2)
 text(0.6,0.2,paste("Percent people left is ", round(perc,2)*100, sep="", "%" ), cex=1.4)
 title("CAP Curve")
+}
+CAP_curve(testing$left, prediction_bayes)
 
 #Build ROC curve (it shows )
 
