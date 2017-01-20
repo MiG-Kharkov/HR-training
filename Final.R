@@ -9,8 +9,7 @@ if (!require("gridExtra"))    install.packages("gridExtra")
 if (!require("ROCR"))    install.packages("ROCR")
 if (!require("fBasics"))    install.packages("fBasics")
 if (!require("randomForest"))    install.packages("randomForest")
-if (!require("vcd"))    install.packages("vcd")
-if (!require("LDPD"))    install.packages("LDPD")
+
 
 # Load librarys
 library(caret)
@@ -23,9 +22,6 @@ library(gridExtra)
 library(ROCR)
 library(fBasics)
 library(randomForest)
-library(ElemStatLearn)
-library(vcd)
-library(LDPD)
 
 # Read database
 dataset <- read.csv("HR_comma_sep.csv")
@@ -98,8 +94,8 @@ set.seed(123)
 split = createDataPartition(y=dataset$left, p=0.33, list=FALSE)
 smallsample <- dataset[split, ]
 
-print(shapiroTest(smallsample$last_evaluation)) # woks for size of sample <=5000
-print(ksnormTest(unique(dataset$last_evaluation)))# woks only for unique elements
+print(shapiroTest(smallsample$last_evaluation)) # works for size of sample <=5000
+print(ksnormTest(unique(dataset$last_evaluation)))# works only for unique elements
 print(adTest(dataset$last_evaluation))
 print(lillieTest(dataset$last_evaluation))
 
