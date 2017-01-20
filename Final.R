@@ -11,6 +11,7 @@ if (!require("fBasics"))    install.packages("fBasics")
 if (!require("randomForest"))    install.packages("randomForest")
 
 
+
 # Load librarys
 library(caret)
 library(ggplot2)
@@ -23,8 +24,10 @@ library(ROCR)
 library(fBasics)
 library(randomForest)
 
+
 # Read database
 dataset <- read.csv("HR_comma_sep.csv")
+
 
 # look at data
 sapply(dataset, function(x) length(unique(x)))

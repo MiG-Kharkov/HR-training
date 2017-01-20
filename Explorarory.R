@@ -418,6 +418,48 @@ title("ROC Curve")
 # train with random forest model
 rf.model <- train(left ~., data = training, method = "rf")
 summary(rf.model)
+randomForest
+rf.prediction <- predict(rf.model, newdata = testing[-7], type = "prob")
+prediction_rf <- (rf.prediction[,2]- rf.prediction[,1]+1)/2
+summary(prediction_rf)
+y_hat <- ifelse(prediction_rf > 0.01, 1, 0)
+y_hat <- as.factor(y_hat)
+cf.05<-confusionMatrix(y_hat, testing$left )
+cf.41<-confusionMatrix(y_hat, testing$left )
+confusionMatrix(y_hat, testing$left )
 
-rf.prediction <- predict(rf.model, newdata = testing[-7])
-confusionMatrix(rf.prediction, testing$left)
+# Density plots probabilities for testing set
+ggplot(testing, aes(x = prediction_rf, fill = factor(left), colour = factor(left))) + 
+  geom_density() + ggtitle("Predicted denity for the test set")
+
+# Confusion Matrix and Statistics
+# 
+# Reference
+# Prediction    0    1
+# 0 2852   28
+# 1    5  864
+# 
+# Accuracy : 0.9912          
+# 95% CI : (0.9877, 0.9939)
+# No Information Rate : 0.7621          
+# P-Value [Acc > NIR] : < 2.2e-16       
+# 
+# Kappa : 0.9755          
+# Mcnemar's Test P-Value : 0.0001283       
+# 
+# Sensitivity : 0.9982          
+# Specificity : 0.9686          
+# Pos Pred Value : 0.9903          
+# Neg Pred Value : 0.9942          
+# Prevalence : 0.7621          
+# Detection Rate : 0.7607          
+# Detection Prevalence : 0.7682          
+# Balanced Accuracy : 0.9834          
+# 
+# 'Positive' Class : 0               
+
+
+# Cumulative Accuracy Profile (CAP)
+# I have probability for previous result so I am going to create CAP pot
+cap_data_rf <- cbind(left = as.numeric(testing$left)-1, predicted = round(prediction_rf,5))
+write.csv(cap_data_rf, "cap_data_rf.csv")
